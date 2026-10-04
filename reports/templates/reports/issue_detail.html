@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{% url 'my_reports' %}" class="small">← My reports</a>
+<h4 class="mt-2 text-capitalize">{{ issue.category.name }}
+  <span class="badge bg-light text-dark border">{{ issue.get_status_display }}</span></h4>
+<p class="text-muted">👥 {{ issue.report_count }} people reported this</p>
+
+<div class="card p-4">
+  <p>✅ <b>Reported</b> · {{ issue.created_at|date:"d M Y" }}</p>
+  {% for u in updates %}
+    <p>🔧 <b>{% if u.status == 'in_progress' %}In Progress{% else %}{{ u.status|capfirst }}{% endif %}</b>
+      · {{ u.updated_at|date:"d M, H:i" }}
+      {% if u.note %}<br><span class="text-muted">{{ u.note }}</span>{% endif %}</p>
+    {% if u.proof_photo %}<img src="{{ u.proof_photo.url }}" style="max-width:260px" class="rounded mb-3">{% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

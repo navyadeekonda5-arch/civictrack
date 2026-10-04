@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card p-4 mb-4">
+  <div class="d-flex align-items-center gap-3">
+    <div class="avatar">{{ user.username|first|upper }}</div>
+    <div>
+      <h4 class="mb-0">{{ user.username }}</h4>
+      <div class="text-muted small">
+        {% if user.email %}{{ user.email }} · {% endif %}Member since {{ user.date_joined|date:"M Y" }}
+        {% if officer %} · <span class="badge bg-primary">Officer, {{ user.officerprofile.department.name }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-4"><div class="stat"><b>{{ stats.total }}</b><span>{% if officer %}Issues{% else %}Reports{% endif %}</span></div></div>
+  <div class="col-4"><div class="stat"><b>{{ stats.active }}</b><span>{% if officer %}Open{% else %}In progress{% endif %}</span></div></div>
+  <div class="col-4"><div class="stat"><b>{{ stats.resolved }}</b><span>Resolved</span></div></div>
+</div>
+
+{% if officer %}
+  <a href="{% url 'officer_dashboard' %}" class="btn btn-primary">Go to dashboard</a>
+{% else %}
+<div class="card p-4">
+  <div class="d-flex justify-content-between mb-2">
+    <h5 class="mb-0">Recent reports</h5>
+    <a href="{% url 'my_reports' %}" class="small">View all</a>
+  </div>
+  {% for r in reports %}
+    <div class="d-flex justify-content-between align-items-center py-2 border-top">
+      <div><span class="text-capitalize fw-medium">{{ r.issue.category.name }}</span>
+        <div class="text-muted small">{{ r.created_at|date:"d M Y" }} · 👥 {{ r.issue.report_count }} reported</div></div>
+      <span class="badge bg-light text-dark border">{{ r.issue.get_status_display }}</span>
+    </div>
+  {% empty %}
+    <p class="text-muted mb-0">No reports yet. <a href="{% url 'submit_report' %}">Report your first issue</a>.</p>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

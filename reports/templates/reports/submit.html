@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="col-md-7 mx-auto card p-4">
+  <h4>Report a civic issue</h4>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3"><label class="form-label">Category</label>{{ form.category }}</div>
+    <div class="mb-3"><label class="form-label">Photo</label>{{ form.photo }}</div>
+    <div class="mb-3"><label class="form-label">Description (optional)</label>{{ form.description }}</div>
+
+    <label class="form-label">Location (drag the pin to adjust)</label>
+    <div id="map" style="height:300px" class="mb-3 rounded"></div>
+    {{ form.latitude }} {{ form.longitude }}
+    {{ form.errors }}
+
+    <button class="btn btn-success w-100">Submit report</button>
+  </form>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const latInput = document.getElementById('id_latitude');
+  const lngInput = document.getElementById('id_longitude');
+
+  // Default: Hyderabad. Replaced by the user's real location below.
+  const map = L.map('map').setView([17.385, 78.4867], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+    referrerPolicy: 'strict-origin-when-cross-origin'
+  }).addTo(map);
+
+  const marker = L.marker([17.385, 78.4867], { draggable: true }).addTo(map);
+
+  function setPosition(lat, lng) {
+    latInput.value = lat;
+    lngInput.value = lng;
+  }
+  setPosition(17.385, 78.4867);
+
+  marker.on('dragend', () => {
+    const p = marker.getLatLng();
+    setPosition(p.lat, p.lng);
+  });
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude, longitude } = pos.coords;
+      map.setView([latitude, longitude], 17);
+      marker.setLatLng([latitude, longitude]);
+      setPosition(latitude, longitude);
+    });
+  }
+</script>
+{% endblock %}

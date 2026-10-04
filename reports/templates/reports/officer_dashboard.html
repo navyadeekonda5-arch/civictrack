@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-1">{{ dept.name }}</h4>
+<p class="text-muted">Issues reported to your department, most urgent first</p>
+
+<div class="row g-3 mb-4">
+  <div class="col-6"><div class="stat"><b>{{ count_open }}</b><span>Open issues</span></div></div>
+  <div class="col-6"><div class="stat"><b>{{ count_done }}</b><span>Resolved</span></div></div>
+</div>
+
+<div class="card p-2">
+  <div class="table-responsive">
+  <table class="table align-middle mb-0">
+    <thead><tr><th>Priority</th><th>Type</th><th>Reports</th><th>Status</th><th>First reported</th><th></th></tr></thead>
+    <tbody>
+    {% for i in issues %}
+      <tr>
+        <td>
+          {% if i.priority_score >= 80 %}🔴 Critical
+          {% elif i.priority_score >= 40 %}🟠 High
+          {% elif i.priority_score >= 20 %}🟡 Medium
+          {% else %}🟢 Low{% endif %}
+          <small class="text-muted">({{ i.priority_score|floatformat:0 }})</small>
+        </td>
+        <td class="text-capitalize">{{ i.category.name }}</td>
+        <td>👥 {{ i.report_count }}</td>
+        <td><span class="badge bg-light text-dark border">{{ i.get_status_display }}</span></td>
+        <td>{{ i.created_at|date:"d M Y" }}</td>
+        <td class="text-end"><a class="btn btn-primary btn-sm" href="{% url 'officer_issue' i.id %}">Open</a></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" class="text-center text-muted py-4">No open issues 🎉</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

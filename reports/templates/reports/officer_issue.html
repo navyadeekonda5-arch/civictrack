@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{% url 'officer_dashboard' %}" class="small">← Back to dashboard</a>
+<h4 class="mt-2 text-capitalize">{{ issue.category.name }}
+  <span class="badge bg-light text-dark border">{{ issue.get_status_display }}</span></h4>
+<p class="text-muted">👥 {{ issue.report_count }} people reported this · Priority score {{ issue.priority_score|floatformat:0 }}</p>
+
+<div class="row g-3 mb-4">
+  {% for r in reports %}
+    <div class="col-6 col-md-3">
+      <div class="card p-2">
+        <img src="{{ r.photo.url }}" class="img-fluid rounded" alt="report photo">
+        <small class="text-muted mt-1">{{ r.description|default:"" }}</small>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="card p-4 mb-4">
+  <h5>Update progress</h5>
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    <div class="mb-3">{{ form.status }}</div>
+    <div class="mb-3">{{ form.note }}</div>
+    <div class="mb-3"><label class="form-label">Proof photo (required for Resolved)</label>{{ form.proof_photo }}</div>
+    <button class="btn btn-primary">Save update</button>
+  </form>
+</div>
+
+<h5>History</h5>
+{% for u in updates %}
+  <div class="card p-3 mb-2">🔧 <b>{% if u.status == 'in_progress' %}In Progress{% else %}{{ u.status|capfirst }}{% endif %}</b>
+    · {{ u.updated_at|date:"d M, H:i" }}
+    {% if u.note %}<div class="text-muted">{{ u.note }}</div>{% endif %}</div>
+{% empty %}<p class="text-muted">No updates yet.</p>{% endfor %}
+{% endblock %}

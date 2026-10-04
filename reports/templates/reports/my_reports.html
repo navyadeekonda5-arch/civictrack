@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3">My reports</h4>
+{% for r in reports %}
+  <div class="card mb-3">
+    <div class="row g-0">
+      <div class="col-md-3">
+        <img src="{{ r.photo.url }}" class="img-fluid rounded-start h-100" style="object-fit:cover" alt="report photo">
+      </div>
+      <div class="col-md-9 card-body">
+        <h5 class="text-capitalize mb-1">{{ r.issue.category.name }}
+          <span class="badge bg-light text-dark border">{{ r.issue.get_status_display }}</span></h5>
+        <p class="mb-1">{{ r.description|default:"No description" }}</p>
+        <small class="text-muted">👥 {{ r.issue.report_count }} people reported this · {{ r.created_at|date:"d M Y" }}</small>
+        <div><a href="{% url 'issue_detail' r.issue.id %}" class="btn btn-outline-primary btn-sm mt-2">View progress</a></div>
+      </div>
+    </div>
+  </div>
+{% empty %}
+  <div class="card p-4 text-center text-muted">You haven't reported anything yet.
+    <div><a href="{% url 'submit_report' %}" class="btn btn-primary btn-sm mt-2">Report an issue</a></div></div>
+{% endfor %}
+{% endblock %}
